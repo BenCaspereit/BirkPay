@@ -31,15 +31,15 @@ BirkPay provides dedicated interfaces for point-of-sale operations, banking, and
 
 ### Point of Sale (POS)
 
-![BirkPay POS interface](pos.png)
+![BirkPay POS interface](docs/assets/images/pos.png)
 
 ### Bank
 
-![BirkPay Bank interface](bank.png)
+![BirkPay Bank interface](docs/assets/images/bank.png)
 
 ### Admin Dashboard
 
-![BirkPay Admin Dashboard](adminPortal.png)
+![BirkPay Admin Dashboard](docs/assets/images/adminPortal.png)
 
 ---
 
