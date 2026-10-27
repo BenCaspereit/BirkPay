@@ -1,0 +1,1 @@
+FÜR DIE SCHÜLER: Kurzanleitung für Bank & Kasse (kann auch direkt ins UI)

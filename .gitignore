@@ -1,0 +1,37 @@
+# Python & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.ruff_cache/
+.pytest_cache/
+.venv/
+venv/
+ENV/
+
+# Folder containing legacy code / old files
+old/
+
+# Environment variables & secrets (Never commit these!)
+.env
+.env.*
+!.env.example
+
+# Frontend & Node (Node.js / React / Next / Vue etc.)
+node_modules/
+dist/
+build/
+.next/
+out/
+
+# IDEs & System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+.obsidian/
+
+# pictures
+*.png
+*.svg
+*.drawio

@@ -1,0 +1,1 @@
+FÜR DEN NACHFOLGER: Kurze techn. Übersicht (Tech Stack, DB-Schema)
