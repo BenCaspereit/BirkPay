@@ -12,6 +12,8 @@ ENV/
 old/
 
 # Environment variables & secrets (Never commit these!)
+*.env
+api_keys.env
 .env
 .env.*
 !.env.example
