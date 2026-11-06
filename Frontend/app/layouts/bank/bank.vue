@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import BankAccountCard from '../../components/bank/accountcard.vue'
+import BankAccountCard from '../../components/Bigaccountcard.vue'
 import BankDepositCard from '../../components/bank/depositcard.vue'
-import BankTranshistory from '../../components/bank/transhistory.vue'
+import BankTranshistory from '../../components/transhistory.vue'
 
 interface Transaction {
   id: string
