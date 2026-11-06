@@ -1,24 +1,45 @@
-# Across the Project
-### Git
-| **Prefix**      | **Meaning / Area of Application**                                                                            | **Example**                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------- |
-| **`feat:`**     | **Feature** – A new feature or function has been added.                                                      | `feat: add user authentication API`         |
-| **`fix:`**      | **Bug Fix** – A bug in the code has been fixed.                                                              | `fix: resolve CORS error in backend`        |
-| **`refactor:`** | **Refactoring** – Code was restructured or cleaned up without changing its functionality (e.g., using Ruff). | `refactor: clean up legacy code with ruff`  |
-| **`docs:`**     | **Documentation** – Changes to documentation (e.g., `README.md` or comments).                                | `docs: add setup guide to README`           |
-| **`chore:`**    | **Routine task** – Changes to the build system, `.gitignore`, packages, etc. (no production code).           | `chore: update .gitignore and dependencies` |
-| **`style:`**    | **Style/Formatting** – Purely cosmetic changes (spaces, commas, formatting) that do not alter the logic.     | `style: fix indentations in CSS`            |
-| **`test:`**     | **Tests** – Tests have been added or revised.                                                                | `test: add unit tests for payment endpoint` |
+# Project Code Conventions
 
-# Backend (Python)
+## Across the Project
+* Indentation: 4 Spaces (Python) / 2 oder 4 Spaces (Frontend via Prettier)
 
-### Code formatting
-- Ruff for code formatting, sorting the librarys and as a Linter
-### Name convention
-- `snake_case` for variables, functions and methods
-- `PascalCase` for classes 
-- `UPPER_CASE` for global constants 
+## Git Commit Prefixes
+| Prefix      | Meaning / Area of Application                        | Example                                     |
+| :---------- | :--------------------------------------------------- | :------------------------------------------ |
+| `feat:`     | Feature – A new feature or function                  | `feat: add user authentication API`         |
+| `fix:`      | Bug Fix – A bug has been fixed                       | `fix: resolve CORS error in backend`        |
+| `refactor:` | Refactoring – Code restructured without logic change | `refactor: clean up legacy code with ruff`  |
+| `docs:`     | Documentation – Changes to docs or comments          | `docs: add setup guide to README`           |
+| `chore:`    | Routine task – Build system, .gitignore, packages    | `chore: update .gitignore and dependencies` |
+| `style:`    | Style/Formatting – Purely cosmetic changes           | `style: fix indentations in CSS`            |
+| `test:`     | Tests – Adding or revising tests                     | `test: add unit tests for payment endpoint` |
+## Git Branch Prefixes 
+| **Prefix**      | **Meaning**                                          | **Example**                                  |
+| --------------- | ---------------------------------------------------- | -------------------------------------------- |
+| **`feature/`**  | Feature – A new feature or function                  | `feature/user-page` oder `feature/dark-mode` |
+| **`fix/`**      | Bug Fix – A bug has been fixed                       | `fix/header-padding`                         |
+| **`refactor/`** | Refactoring – Code restructured without logic change | `refactor/api-cleanup`                       |
+| **`docs/`**     | Documentation – Changes to docs or comments          | `docs/update-readme`                         |
+| **`hotfix/`**   | Critical error in the live system                    | `hotfix/crash-on-launch`                     |
 
-# Frontend (Vue.js)
+## Backend (Python / FastAPI)
+* **Code Formatting:** Ruff (Linting, Formatting & Import Sorting)
+* **Name Conventions:**
+  * `snake_case` for variables, functions, and methods
+  * `PascalCase` for classes and Pydantic models
+  * `UPPER_CASE` for global constants
 
-# Database (PostgreSQL)
+## Frontend (Vue.js)
+* **Tools:** ESLint + Prettier
+* **Name Conventions:**
+  * `PascalCase` for component files (`UserProfile.vue`) and usage
+  * `camelCase` for JS/TS variables, functions, and props
+* **Color Convention (`/frontend/src/assets/css/main.css`):**
+  * Use CSS Custom Properties (`--color-primary`, `--color-bg-main`) instead of hardcoded hex codes.
+
+## Database (PostgreSQL)
+* **Name Conventions:**
+  * `snake_case` for tables, columns, and foreign keys
+  * Plural nouns for table names (`users`, `orders`)
+* **SQL Style:**
+  * SQL keywords in UPPERCASE (e.g., `SELECT`, `FROM`, `WHERE`)
