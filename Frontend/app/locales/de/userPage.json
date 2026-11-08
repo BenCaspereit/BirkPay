@@ -1,3 +1,8 @@
 {
-    "title": "Mein Konto"
+    "title": "Mein Konto",
+    "balance": "Kontostand",
+    "history": "Verlauf",
+    "entries": "Einträge",
+    "transactions": "Transaktionen",
+    "noTransactions": "Keine Transaktionen"
 }
