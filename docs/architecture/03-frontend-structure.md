@@ -87,9 +87,9 @@ The home page `pages/index.vue` redirects to `/adminPortal`. `pages/bank/index.v
 
 ## Backend Integration: Current State
 
-No `fetch`, `useFetch`, Axios, or `/api/v1` calls were found in the inspected `Frontend/app` tree. No API service or composable files were found there either. Consequently, there is currently no shared API client, centralized error handling, or frontend API state.
+The POS layout keeps its product catalogue and cart locally, but payment now waits for a keyboard-wedge NFC scan and submits the scanned UID and cart items through `server/api/pos/checkout.post.ts` to `POST /api/v1/transactions/checkout`. The server route supplies `X-NFC-Key` from private runtime configuration; successful completion depends on the backend response. Backend API contracts are described in [Backend Structure](./02-backend-structure.md).
 
-For example, the current `pages/pos/pos.vue` keeps products as local sample data, calculates the cart client-side, and simulates NFC payment completion with a timeout. It does not submit a checkout to the backend. API contracts and authentication are described in [Backend Structure](./02-backend-structure.md); a future integration must explicitly wire the API base URL, `X-NFC-Key`, and cent conversion.
+Configure `NUXT_BACKEND_BASE_URL` with the backend origin and `NUXT_CASHIER_NFC_UID` with the UID of an authorized cashier/admin card. Both values are private server runtime configuration. Payment simulation is disabled by default; set `NUXT_PUBLIC_PAYMENT_SIMULATION=true` only when intentionally testing the UI without a card or backend checkout.
 
 ## Dependencies and Scripts
 
