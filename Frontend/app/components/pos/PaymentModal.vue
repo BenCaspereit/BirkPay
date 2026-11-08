@@ -1,18 +1,48 @@
 <script setup lang="ts">
+import { ref, watch, nextTick } from 'vue'
+import { usePaymentScanner } from '@/composables/usePaymentScanner'
+
 type PaymentState = 'waiting' | 'success' | 'error'
 
-defineProps<{
+const props = withDefaults(defineProps<{
   open: boolean
   state: PaymentState
   amountEuro: string
   errorMessage: string
-}>()
+  testMode: boolean
+}>(), {
+  testMode: false
+})
 
 const emit = defineEmits<{
   (event: 'cancel'): void
   (event: 'retry'): void
   (event: 'close'): void
+  (event: 'scan', uid: string): void // Neu: Überträgt die Kartennummer nach oben
 }>()
+
+const hiddenInputRef = ref<HTMLInputElement | null>(null)
+
+// Scanner-Composable einbinden
+const { handleKey, start, stop } = usePaymentScanner((uid) => {
+  emit('scan', uid)
+})
+
+// Überwachen, ob das Modal sich öffnet und im 'waiting'-Status ist
+watch(
+  () => [props.open, props.state],
+  async ([isOpen, currentState]) => {
+    if (isOpen && currentState === 'waiting') {
+      start()
+      await nextTick()
+      // Verstecktes Input-Feld fokussieren, damit das iPad die Bluetooth-Tastatur-Events abfängt
+      hiddenInputRef.value?.focus()
+    } else {
+      stop()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -21,6 +51,18 @@ const emit = defineEmits<{
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
     role="presentation"
   >
+    <!-- WICHTIG FÜR IPAD / SAFARI:
+         Dieses unsichtbare Input-Feld fängt die Bluetooth-HID-Signale ab, 
+         ohne dass eine störende Bildschirmtastatur auf dem iPad hochklappt. -->
+    <input
+      ref="hiddenInputRef"
+      type="text"
+      class="opacity-0 absolute -left-[9999px]"
+      @keydown.stop="handleKey"
+      tabindex="-1"
+      aria-hidden="true"
+    />
+
     <section
       class="w-full max-w-sm rounded-xl bg-white p-6 text-center shadow-xl"
       role="dialog"
@@ -35,6 +77,9 @@ const emit = defineEmits<{
         </h2>
         <p class="mt-2 text-sm text-gray-600">
           Bitte halte die BirkPay-Karte an das Terminal.
+        </p>
+        <p v-if="testMode" class="mt-2 text-xs font-medium text-amber-700">
+          Testmodus: Die Zahlung wird ohne Karten-Scan simuliert.
         </p>
         <button
           @click="emit('cancel')"

@@ -50,21 +50,34 @@ const totalEuro = computed(() => {
   return cart.value.reduce((sum, item) => sum + item.priceEuro * item.qty, 0).toFixed(2)
 })
 
-// Simulated NFC/Card Scan State
-const isProcessing = ref(false)
-const scanMessage = ref('')
+// --- Zahlungs- und Modal-Zustand ---
+const isModalOpen = ref(false)
+const paymentState = ref<'waiting' | 'success' | 'error'>('waiting')
+const errorMessage = ref('')
 
-const processPayment = () => {
+// Öffnet das Modal und versetzt es in den Warte-Modus (ohne Timer!)
+const openPaymentModal = () => {
   if (cart.value.length === 0) return
-  isProcessing.value = true
-  scanMessage.value = 'Bitte BirkPay-Karte auflegen...'
-  
-  // Simulation einer Zahlung nach 1.5 Sekunden
-  setTimeout(() => {
-    isProcessing.value = false
-    alert(`Zahlung erfolgreich! ${totalEuro.value} vom Konto abgebucht.`)
+  paymentState.value = 'waiting'
+  errorMessage.value = ''
+  isModalOpen.value = true
+}
+
+// Wird NUR ausgeführt, wenn der Scanner tatsächlich Daten liefert
+const handleCardScanned = async (uid: string) => {
+  try {
+    // Hier kommt später dein API-Call hin
+    paymentState.value = 'success'
     clearCart()
-  }, 1500)
+  } catch (err: any) {
+    paymentState.value = 'error'
+    errorMessage.value = 'Zahlung fehlgeschlagen.'
+  }
+}
+
+const retryPayment = () => {
+  paymentState.value = 'waiting'
+  errorMessage.value = ''
 }
 </script>
 
@@ -166,15 +179,27 @@ const processPayment = () => {
         </div>
 
         <button
-          @click="processPayment"
-          :disabled="cart.length === 0 || isProcessing"
+          @click="openPaymentModal"
+          :disabled="cart.length === 0"
           class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 py-3.5 text-base font-bold text-white shadow-sm transition-colors hover:bg-teal-700 disabled:opacity-50"
         >
           <Icon name="material-symbols:contactless-outline" class="h-6 w-6" />
-          <span>{{ isProcessing ? scanMessage : 'Jetzt Abbuchen (NFC Scan)' }}</span>
+          <span>Jetzt Abbuchen (NFC Scan)</span>
         </button>
       </div>
     </div>
+
+    <!-- Das Zahlungs-Modal mit integriertem Scanner -->
+    <PaymentModal
+        :open="isModalOpen"
+        :state="paymentState"
+        :amount-euro="totalEuro"
+        :error-message="errorMessage"
+        @cancel="isModalOpen = false"
+        @close="isModalOpen = false"
+        @retry="retryPayment"
+        @scan="handleCardScanned"
+    />
 
   </div>
 </template>

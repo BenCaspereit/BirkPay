@@ -3,6 +3,14 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2026-10-05',
 
+  runtimeConfig: {
+    backendBaseUrl: '',
+    cashierNfcUid: '',
+    public: {
+      paymentSimulation: false
+    }
+  },
+
   modules: [
     '@nuxt/icon',
     '@nuxt/ui'

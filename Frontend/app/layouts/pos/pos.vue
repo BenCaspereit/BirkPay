@@ -76,7 +76,7 @@ const totalEuro = computed(() => {
   return cart.value.reduce((sum, item) => sum + item.priceEuro * item.qty, 0).toFixed(2)
 })
 
-// Simulated NFC/Card Scan State
+// Payment state
 const isProcessing = ref(false)
 const scanMessage = ref('')
 const showPaymentModal = ref(false)
@@ -84,12 +84,16 @@ const successAmountEuro = ref('0.00')
 const paymentState = ref<'waiting' | 'success' | 'error'>('waiting')
 const paymentErrorMessage = ref('')
 const isPosMenuOpen = ref(false)
+const runtimeConfig = useRuntimeConfig()
+const isPaymentSimulationEnabled = String(runtimeConfig.public.paymentSimulation).toLowerCase() === 'true'
 let paymentTimeout: ReturnType<typeof setTimeout> | undefined
+let paymentAttempt = 0
 
 const processPayment = () => {
   if (cart.value.length === 0) return
   if (paymentTimeout) clearTimeout(paymentTimeout)
 
+  paymentAttempt += 1
   isProcessing.value = true
   scanMessage.value = 'Warte auf Karte...'
   successAmountEuro.value = totalEuro.value
@@ -97,15 +101,63 @@ const processPayment = () => {
   paymentState.value = 'waiting'
   showPaymentModal.value = true
 
-  paymentTimeout = setTimeout(() => {
-    paymentTimeout = undefined
+  if (isPaymentSimulationEnabled) {
+    paymentTimeout = setTimeout(() => {
+      paymentTimeout = undefined
+      isProcessing.value = false
+      paymentState.value = 'success'
+      clearCart()
+    }, 2000)
+  }
+}
+
+const getPaymentErrorMessage = (error: unknown): string => {
+  if (typeof error === 'object' && error !== null && 'data' in error) {
+    const data = error.data
+    if (typeof data === 'object' && data !== null && 'detail' in data) {
+      const detail = data.detail
+      if (typeof detail === 'string') return detail
+      if (typeof detail === 'object' && detail !== null && 'message' in detail) {
+        const message = detail.message
+        if (typeof message === 'string') return message
+      }
+    }
+  }
+
+  return error instanceof Error ? error.message : 'Die Zahlung konnte nicht verarbeitet werden.'
+}
+
+const handleCardScanned = async (uid: string) => {
+  const attempt = paymentAttempt
+  if (isPaymentSimulationEnabled) return
+
+  try {
+    const result = await $fetch<{ total_amount_cents: number }>('/api/pos/checkout', {
+      method: 'POST',
+      body: {
+        nfc_uid: uid,
+        items: cart.value.map(item => ({
+          product_id: item.id,
+          quantity: item.qty
+        }))
+      }
+    })
+
+    if (attempt !== paymentAttempt) return
+    successAmountEuro.value = (result.total_amount_cents / 100).toFixed(2)
     isProcessing.value = false
     paymentState.value = 'success'
     clearCart()
-  }, 2000)
+  } catch (error) {
+    if (attempt !== paymentAttempt) return
+    isProcessing.value = false
+    paymentErrorMessage.value = getPaymentErrorMessage(error)
+    paymentState.value = 'error'
+  }
 }
 
 const cancelPayment = () => {
+  paymentAttempt += 1
   if (paymentTimeout) clearTimeout(paymentTimeout)
   paymentTimeout = undefined
   isProcessing.value = false
@@ -117,6 +169,7 @@ const closePaymentModal = () => {
 }
 
 onBeforeUnmount(() => {
+  paymentAttempt += 1
   if (paymentTimeout) clearTimeout(paymentTimeout)
 })
 </script>
@@ -182,9 +235,11 @@ onBeforeUnmount(() => {
       :state="paymentState"
       :amount-euro="successAmountEuro"
       :error-message="paymentErrorMessage"
+      :test-mode="isPaymentSimulationEnabled"
       @cancel="cancelPayment"
       @retry="processPayment"
       @close="closePaymentModal"
+      @scan="handleCardScanned"
     />
   </div>
 </template>
